@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body >
+      <div class="form-box">
+        <h1>WebSocket Chat</h1>
+        <form onsubmit="showForm(event)" id="connect">
+          <input type="text" id="clientname" placeholder="Enter your name" style="padding: 0 10px; border: blue; border-width: 5px; border-radius: 8px; height: 30px; width: 250px;">
+          <button >Connect</button>
+        </form>
+        <form action="" onsubmit="sendMessage(event)" id="form" style="display: none">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button>Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+      </div>
+
+        <script>
+            var ws
+
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                // var message = document.createElement('li')
+                // var content = document.createTextNode(input.value)
+                // message.appendChild(content);
+                // messages.appendChild(message);
+                ws.send(input.value);
+
+                input.value = ''
+                event.preventDefault()
+            }
+
+            function processMessage(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content);
+                messages.appendChild(message);
+            }
+            
+            function showForm(event) {
+                event.preventDefault()
+
+                var clientName = document.getElementById("clientname").value;
+                console.log(clientName)
+                var clientID = Date.now();
+                ws = new WebSocket(`ws://localhost:8000/ws/${clientName}`);
+
+                ws.onmessage = processMessage;
+
+                var button = document.getElementById("connect");
+                var form = document.getElementById("form");
+                button.style.display = "none";
+                form.style.display = "block";
+            }
+
+        </script>
+    </body>
+</html>
